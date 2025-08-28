@@ -1,0 +1,12 @@
+# -- Virtual Environment --
+fastapienv/
+# -- Python --
+__pycache__/
+*.pyc
+# -- IDE --
+.idea/
+# -- Databases --
+*.db
+*.sqlite3
+# Ignore Windows-specific files
+Thumbs.db
