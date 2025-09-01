@@ -11,7 +11,7 @@ class Users(Base):
     first_name = Column(String)
     last_name = Column(String)
     hashed_password = Column(String)
-    is_active = Column(Boolean)
+    is_active = Column(Boolean, default=True)
 
     todos = relationship("TodoList", back_populates="owner")
 
