@@ -5,7 +5,7 @@ from database import Base
 class Users(Base):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True)
     email_id = Column(String, unique=True, index=True)
     username = Column(String, unique=True, index=True)
     first_name = Column(String)
@@ -13,7 +13,7 @@ class Users(Base):
     hashed_password = Column(String)
     is_active = Column(Boolean)
 
-    todos = relationship("Todos", backref="user")
+    todos = relationship("TodoList", back_populates="owner")
 
 class TodoList(Base):
     __tablename__ = 'todo_list'
