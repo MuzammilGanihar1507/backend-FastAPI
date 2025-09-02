@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, Depends, HTTPException
 from pydantic import BaseModel
 from typing import Optional
@@ -8,9 +10,11 @@ from database import SessionLocal, engine
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from datetime import datetime, timedelta, UTC
 from jose import jwt
-import generate_secret_key_locally_for_JWT
+from dotenv import load_dotenv
 
-SECRET_KEY = generate_secret_key_locally_for_JWT.generate_hs256_secret()
+
+load_dotenv()
+SECRET_KEY = os.getenv("JWT_SECRET")
 ALGORITHM = "HS256"
 
 class CreateUser(BaseModel):

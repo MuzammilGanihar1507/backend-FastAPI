@@ -10,5 +10,6 @@ def generate_hs256_secret(fmt: str = "urlsafe") -> str:
     key_bytes = secrets.token_bytes(32)  # 32 bytes = 256 bits
 
     # urlsafe base64 without padding (‘=’), great for .env / headers
-    return base64.urlsafe_b64encode(key_bytes).rstrip(b"=").decode("utf-8")
+    print(base64.urlsafe_b64encode(key_bytes).rstrip(b"=").decode("utf-8"))
 
+generate_hs256_secret()
