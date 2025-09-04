@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("JWT_SECRET") # run the generate_secret_key_locally_for_JWT file and add that to the .env file, and then you'll be able to use it here.
+SECRET_KEY = os.getenv("JWT_SECRET")
 ALGORITHM = "HS256"
 
 class CreateUser(BaseModel):
@@ -56,13 +56,9 @@ def authenticate_user(username: str, password: str, db):
     return user
 
 def create_access_token(username: str, user_id: int, expires_delta: Optional[timedelta] = None):
-    encode = {"sub": username, "id": user_id}
-    if expires_delta:
-        expire_time = datetime.now(UTC).astimezone(UTC) + expires_delta
-    else:
-        expire_time = datetime.now() + timedelta(minutes=15)
-    encode.update({"exp": expire_time})
-    return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
+    expire_time = datetime.now(UTC) + (expires_delta or timedelta(minutes=15))
+    payload = {"sub": username, "id": user_id, "exp": expire_time}
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 async def get_current_user(token: str = Depends(oauth2_bearer)):
     try:
