@@ -9,12 +9,13 @@ from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from datetime import datetime, timedelta, UTC
-from jose import jwt
+from jose import jwt, JWTError
 from dotenv import load_dotenv
 
 
 load_dotenv()
-SECRET_KEY = os.getenv("JWT_SECRET")
+
+SECRET_KEY = os.getenv("JWT_SECRET") # run the generate_secret_key_locally_for_JWT file and add that to the .env file, and then you'll be able to use it here.
 ALGORITHM = "HS256"
 
 class CreateUser(BaseModel):
@@ -62,6 +63,17 @@ def create_access_token(username: str, user_id: int, expires_delta: Optional[tim
         expire_time = datetime.now() + timedelta(minutes=15)
     encode.update({"exp": expire_time})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
+
+async def get_current_user(token: str = Depends(oauth2_bearer)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        user_id: int = payload.get("id")
+        if username is None or user_id is None:
+            raise HTTPException(status_code=404, detail="User not found")
+        return {"username": username, "id": user_id}
+    except JWTError:
+        raise HTTPException(status_code=404, detail="User not found")
 
 @app.post("/create/user")
 async def create_user(user_data: CreateUser, db: Session = Depends(get_db)):
