@@ -70,8 +70,11 @@ async def create_todo_item(todo_item: CreateTodoItem, user: dict = Depends(get_c
             'transaction': 'Success'}
 
 @app.put("/todo_item/{item_id}")
-async def update_to_do(item_id: int, todo_item: CreateTodoItem, db: Session = Depends(get_db)):
-    todo_item_match = db.query(models.TodoList).filter(models.TodoList.id == item_id).first()
+async def update_todo(item_id: int, todo_item: CreateTodoItem, user: dict = Depends(get_current_user) , db: Session = Depends(get_db)):
+    if user is None:
+        raise get_user_exception
+
+    todo_item_match = db.query(models.TodoList).filter(models.TodoList.id == item_id).filter(models.TodoList.owner_id == user.get("id")).first()
 
     if todo_item_match is None:
         http_exception()
