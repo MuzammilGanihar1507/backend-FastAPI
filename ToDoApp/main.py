@@ -52,12 +52,16 @@ async def read_todo_item(item_id: int, user: dict = Depends(get_current_user) , 
     raise http_exception()
 
 @app.post("/create_todo_item")
-async def create_todo_item(todo_item: CreateTodoItem, db:Session = Depends(get_db)):
+async def create_todo_item(todo_item: CreateTodoItem, user: dict = Depends(get_current_user),  db:Session = Depends(get_db)):
+    if user is None:
+        raise get_user_exception 
+       
     todo_model = models.TodoList()
     todo_model.title = todo_item.title
     todo_model.description = todo_item.description
     todo_model.priority = todo_item.priority
     todo_model.complete = todo_item.complete
+    todo_model.owner_id = user.get("id")
 
     db.add(todo_model)
     db.commit()
