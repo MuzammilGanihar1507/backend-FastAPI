@@ -4,6 +4,7 @@ import models
 from database import engine, SessionLocal
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, Field
+from auth import get_current_user, get_user_exception
 
 app = FastAPI(title="Todo Application")
 
@@ -26,6 +27,12 @@ class CreateTodoItem(BaseModel):
 @app.get("/")
 async def read_all(db:Session = Depends(get_db)):
     return db.query(models.TodoList).all()
+
+@app.get("/todo_list/user")
+async def read_all_by_user(user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+    if user is None:
+        raise get_user_exception
+    return db.query(models.TodoList).filter(models.TodoList.owner_id == user.get("id")).all()
 
 @app.get("/todo_item/{item_id}")
 async def read_todo_item(item_id: int, db:Session = Depends(get_db)):
