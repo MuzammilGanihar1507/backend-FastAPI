@@ -28,19 +28,28 @@ class CreateTodoItem(BaseModel):
 async def read_all(db:Session = Depends(get_db)):
     return db.query(models.TodoList).all()
 
-@app.get("/todo_list/user")
-async def read_all_by_user(user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+@app.get("/todo_list/user") 
+async def read_all_of_user(user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+    """
+    This API returns all the todo_items of the logged in user.
+    """
     if user is None:
         raise get_user_exception
     return db.query(models.TodoList).filter(models.TodoList.owner_id == user.get("id")).all()
 
-@app.get("/todo_item/{item_id}")
-async def read_todo_item(item_id: int, db:Session = Depends(get_db)):
-    todo_item = db.query(models.TodoList).filter(models.TodoList.id == item_id).first()
+@app.get("/todo_list/{item_id}")
+async def read_todo_item(item_id: int, user: dict = Depends(get_current_user) , db:Session = Depends(get_db)):
+    """
+    This API returns the todo_item based on the item_id in the URL of the logged in user.
+    """
+    if user is None:
+        raise get_user_exception
+    else:
+        todo_item = db.query(models.TodoList).filter(models.TodoList.id == item_id).filter(models.TodoList.owner_id == user.get("id")).first()
 
     if todo_item is not None:
         return todo_item
-    http_exception()
+    raise http_exception()
 
 @app.post("/create_todo_item")
 async def create_todo_item(todo_item: CreateTodoItem, db:Session = Depends(get_db)):
